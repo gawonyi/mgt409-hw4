@@ -55,7 +55,11 @@ This file records the prompts I gave my vibe coder, one section per problem.
 > Add a chat interface in the bottom-right corner of the website. A floating chat panel is acceptable. For now, it does not need to connect to an agent; a placeholder that can later call the backend is sufficient for this problem.
 > You will soon need a small API to retrieve data from the database. You may begin by creating a basic FastAPI application in `backend/main.py` that serves products and images, and then expand it into the full agent backend in Problem 5.
 
-**Follow-up prompt:** None needed.
+**Follow-up prompt:**
+
+> (sent a screenshot of the home page) Is this right? … It's not showing — fix it.
+
+What was lacking after the first prompt: the "Hoodie season" products never loaded because the backend wasn't running/reachable. The fix made `main.py` work on older Python versions and pointed the Vite proxy at `127.0.0.1:8000`, and then I started the backend in its own terminal.
 
 ---
 

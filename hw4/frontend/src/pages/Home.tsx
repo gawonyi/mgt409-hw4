@@ -14,8 +14,13 @@ const SHOP_BY = [
 
 export default function Home() {
   const [featured, setFeatured] = useState<Product[]>([]);
+  const [count, setCount] = useState<number | null>(null);
 
   useEffect(() => {
+    fetch("/api/stats")
+      .then((r) => r.json())
+      .then((d) => setCount(d.product_count))
+      .catch(() => setCount(null));
     fetchProducts({ category: "hoodie", inStock: true, sort: "stock" })
       .then((p) => setFeatured(p.slice(0, 4)))
       .catch(() => setFeatured([]));
@@ -32,7 +37,7 @@ export default function Home() {
             team tees, and gifts for the whole Bulldog family.
           </p>
           <div className="hero-actions">
-            <Link to="/products" className="button">Shop all 102 products</Link>
+            <Link to="/products" className="button">{count ? `Shop all ${count} products` : "Shop all products"}</Link>
             <button className="button ghost" onClick={() => askInChat("What hoodies do you have?")}>
               Ask what's in stock
             </button>

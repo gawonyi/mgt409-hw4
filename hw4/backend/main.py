@@ -38,7 +38,12 @@ SIZE_ORDER = ["XS", "S", "M", "L", "XL", "XXL"]
 
 # Auth settings. Hash format matches the seed users: pbkdf2_sha256$<salt>$<hex digest>
 PBKDF2_ITERATIONS = 120_000
-SECRET_KEY = os.getenv("SECRET_KEY", "dev-only-change-me")
+SECRET_KEY = os.getenv("SECRET_KEY") or ""
+if not SECRET_KEY:
+    # Tokens are still signed so local dev works, but warn loudly: anyone who knows this
+    # default could forge a login token. Set SECRET_KEY in .env for any real deployment.
+    SECRET_KEY = "dev-only-change-me"
+    print("[auth] WARNING: SECRET_KEY is not set in .env; using an insecure development key.")
 TOKEN_TTL_SECONDS = 7 * 24 * 3600
 
 app = FastAPI(title="Campus Customs API")
@@ -84,7 +89,16 @@ def health() -> dict:
         "db_found": DB_PATH.exists(),
         "model": MODEL_NAME,
         "api_key_loaded": bool(os.getenv("PORTKEY_API_KEY")),
+        "secret_key_set": bool(os.getenv("SECRET_KEY")),
     }
+
+
+@app.get("/api/stats")
+def stats() -> dict:
+    """Live store numbers for the home page (no hard-coded counts)."""
+    with get_db() as conn:
+        n = conn.execute("SELECT count(*) FROM catalogue").fetchone()[0]
+    return {"product_count": n}
 
 
 @app.get("/api/products")
