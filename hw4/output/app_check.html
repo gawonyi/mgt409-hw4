@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Campus Customs — App Check</title>
+<style>
+  :root { --navy:#12284b; --ink:#1b2330; --muted:#5f6b7d; --line:#dde2ea; --gold:#e2b33c; --chalk:#f3f5f8; --green:#1d6b4f; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color:var(--ink); background:var(--chalk); line-height:1.55; }
+  header { background:var(--navy); color:#fff; padding:28px 24px; border-bottom:4px solid var(--gold); }
+  header h1 { margin:0 0 6px; font-size:1.8rem; }
+  header p { margin:0; color:#d5ddeb; }
+  main { max-width:980px; margin:0 auto; padding:24px 16px 60px; }
+  nav.toc { background:#fff; border:1px solid var(--line); border-radius:12px; padding:14px 18px; margin-bottom:24px; }
+  nav.toc ol { margin:6px 0 0; padding-left:20px; }
+  section { background:#fff; border:1px solid var(--line); border-radius:14px; padding:22px; margin-bottom:24px; }
+  section h2 { margin:0 0 4px; color:var(--navy); font-size:1.35rem; }
+  .req { margin:0 0 14px; color:var(--muted); font-size:.92rem; }
+  .shots { display:flex; gap:18px; flex-wrap:wrap; }
+  figure { margin:0; flex:1 1 280px; max-width:380px; }
+  figure img { width:100%; border:1px solid var(--line); border-radius:10px; display:block; }
+  figcaption { font-size:.92rem; margin-top:8px; }
+  .proves { margin:14px 0 0; padding:12px 14px; background:#e3f3ec; border-left:4px solid var(--green); border-radius:8px; }
+  .meta { font-size:.85rem; color:var(--muted); }
+  code { background:#eef1f6; padding:1px 5px; border-radius:4px; font-size:.88em; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Campus Customs — App Check</h1>
+  <p>Homework 4, Problem 11 · Gawon Yi · Live site tested on 2026-10-07 (React + Vite front end on :5173, FastAPI + PydanticAI backend on :8000, model <code>gpt-5.6-luna</code> via Portkey)</p>
+</header>
+<main>
+  <nav class="toc">
+    <strong>Checks</strong>
+    <ol>
+      <li><a href="#inventory">Chat looks up real price and inventory from the database</a></li>
+      <li><a href="#search">Category question puts dynamic product cards on the page</a></li>
+      <li><a href="#usability">Problem 9 usability feature: product filters and sorting</a></li>
+    </ol>
+  </nav>
+
+  <section id="inventory">
+    <h2>1. Chat checks inventory and price from the database</h2>
+    <p class="req">Requirement: the chat retrieves a product's actual inventory level and price from the DB.</p>
+    <div class="shots">
+      <figure>
+        <img src="app_check_images/inventory.jpg" alt="Chat answering that the Yale Mom Hoodie is $68.00 with 8 left in size M, with tool chips find_product, get_price and get_stock">
+        <figcaption>Question: “How much is the Yale Mom Hoodie, and how many are left in size M?”</figcaption>
+      </figure>
+    </div>
+    <p class="proves">The tool chips show the agent called <code>find_product</code> → <code>get_price</code> → <code>get_stock</code>, and its answer of <strong>$68.00</strong> with <strong>8 left in M</strong> matches the database exactly (<code>catalogue.price = 68.0</code>; <code>inventory</code> for <code>yale-mom-hoodie</code>, size M = 8).</p>
+  </section>
+
+  <section id="search">
+    <h2>2. Dynamic search cards after a category question</h2>
+    <p class="req">Requirement: matching product cards appear on the page after a category question such as hoodies.</p>
+    <div class="shots">
+      <figure>
+        <img src="app_check_images/search_chat.jpg" alt="Chat reply to 'What hoodies do you have?' saying there are 27 hoodies, with a search_catalogue tool chip and a 'Hoodies shown on the page' pill">
+        <figcaption>Chat: “What hoodies do you have?” → <code>search_catalogue</code>, “27 hoodies”, plus the “Hoodies shown on the page” pill.</figcaption>
+      </figure>
+      <figure>
+        <img src="app_check_images/search_cards.jpg" alt="'From your chat — Hoodies, 27 matches, showing 24' panel with hoodie product cards on the Home page">
+        <figcaption>With the chat closed, the Home page now has a “From your chat · Hoodies” grid (27 matches, showing 24).</figcaption>
+      </figure>
+    </div>
+    <p class="proves">The agent returned structured <code>page_results</code> (product IDs from the search tool, turned into cards from the DB), and the front end rendered them as normal product cards with image, name, price and description. Each card links to its <code>/products/:id</code> detail page.</p>
+  </section>
+
+  <section id="usability">
+    <h2>3. Problem 9 usability feature — product filters &amp; sorting</h2>
+    <p class="req">Requirement: show one of the usability improvements from Problem 9 (see <code>usability.md</code>, front-end improvement 1).</p>
+    <div class="shots">
+      <figure>
+        <img src="app_check_images/usability_filters.jpg" alt="Products page with Hoodies chip selected, In stock only checked, sorted Price low to high, 27 items, first item $45.00">
+        <figcaption>Products page at <code>/products?category=hoodie&amp;sort=price_asc&amp;instock=1</code>.</figcaption>
+      </figure>
+    </div>
+    <p class="proves">The <strong>Hoodies</strong> category chip, the <strong>In stock only</strong> toggle and the <strong>Price: low to high</strong> sort narrow 102 products to 27 hoodies, cheapest first (UA Gameday Double Knit Hood, $45.00). The filters are kept in the URL, so they survive Back and refresh.</p>
+  </section>
+
+  <p class="meta">Screenshots were taken in the Claude desktop app's browser pane, which is phone-width, so the site shows its mobile layout. All image paths are relative (<code>app_check_images/…</code>), so this page opens directly from the <code>output/</code> folder.</p>
+</main>
+</body>
+</html>

@@ -1,0 +1,21 @@
+# secrets — real keys live only in Documents/codex/.env (or a local .env), never in git
+.env
+.env.*
+!.env.example
+*.key
+
+# local-only data pack (database + product images) — see README
+data/
+*.db
+*.sqlite
+
+# build / dependency output
+node_modules/
+frontend/dist/
+__pycache__/
+*.pyc
+.venv/
+.DS_Store
+
+# Vite temp files
+*.timestamp-*.mjs
